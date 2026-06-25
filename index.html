@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover"
+    />
+    <!-- Font Awesome 6 (Free CDN) -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <title>Ex Global | Mobile Dashboard</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          "Inter",
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        background: #eef2f7;
+        color: #121826;
+        line-height: 1.45;
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Phone viewport container – modern card style */
+      .phone-container {
+        max-width: 420px;
+        width: 100%;
+        margin: 0 auto;
+        background: #ffffff;
+        min-height: 100vh;
+        box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2);
+        border-radius: 0px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      /* Disabled state for the main container (blur + no interaction) */
+      .phone-container.disabled-container {
+        filter: blur(6px);
+        opacity: 0.4;
+        pointer-events: none;
+        user-select: none;
+        transform: scale(0.98);
+        transition: all 0.3s ease;
+      }
+
+      /* New container that appears on top (slide in effect) */
+      .new-phone-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        max-width: 420px;
+        margin: 0 auto;
+        background: #ffffff;
+        z-index: 1000;
+        box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        animation: slideInRight 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        overflow-y: auto;
+      }
+
+      @keyframes slideInRight {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      /* Slide out animation when closing */
+      .new-phone-container.slide-out {
+        animation: slideOutRight 0.3s ease forwards;
+      }
+
+      @keyframes slideOutRight {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+
+      /* ========= HEADER SECTION ========= */
+      .app-header {
+        padding: 1.75rem 1.5rem 0.75rem 1.5rem;
+        color: rgb(99, 96, 96);
+      }
+
+      .brand-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+
+      .brand-title h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        background: black;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        margin-bottom: -0.75rem;
+        font-family: "Courier New", Courier, monospace;
+      }
+
+      .brand-title p {
+        font-size: 0.85rem;
+        font-weight: 400;
+        opacity: 0.85;
+        margin-top: 0.2rem;
+      }
+
+      /* ========= HERO MEDIA ========= */
+      .hero-media {
+        padding: 1rem 1.2rem 0.5rem 1.2rem;
+      }
+
+      .hero-image {
+        width: 100%;
+        border-radius: 1.5rem;
+        object-fit: cover;
+        box-shadow: 0 12px 22px -8px rgba(0, 0, 0, 0.12);
+        transition: transform 0.2s ease;
+        display: block;
+      }
+
+      /* ========= ACTION MENU (3 cards) ========= */
+      .action-grid {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.5rem 1.2rem 1rem 1.2rem;
+      }
+
+      .action-card {
+        background: #ffffff;
+        flex: 1;
+        text-align: center;
+        padding: 0.9rem 0.5rem;
+        border-radius: 1.2rem;
+        box-shadow:
+          0 6px 14px rgba(0, 0, 0, 0.02),
+          0 2px 4px rgba(0, 0, 0, 0.03);
+        transition: all 0.2s ease;
+        border: 1px solid #eef2f9;
+        cursor: pointer;
+      }
+
+      .action-card:hover {
+        transform: translateY(-3px);
+        border-color: #cbdbe2;
+        box-shadow: 0 15px 25px -12px rgba(0, 0, 0, 0.1);
+      }
+
+      .action-card i {
+        font-size: 2.1rem;
+        color: #1f6392;
+        margin-bottom: 0.4rem;
+        display: inline-block;
+      }
+
+      .action-card p {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #1f2a3e;
+        margin-top: 0.25rem;
+      }
+
+      /* ========= INFO CARDS (notice & warning) ========= */
+      .info-section {
+        padding: 0.5rem 1.2rem 0.8rem 1.2rem;
+      }
+
+      .info-card {
+        background: #ffffff;
+        border-radius: 1.2rem;
+        padding: 1.2rem 1.2rem;
+        margin-bottom: 1rem;
+        box-shadow:
+          0 4px 12px rgba(0, 0, 0, 0.02),
+          0 1px 2px rgba(0, 0, 0, 0.03);
+        border: 1px solid #edf2f7;
+        transition: box-shadow 0.2s;
+      }
+
+      .info-card h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 0.9rem;
+        color: #0f2b38;
+        letter-spacing: -0.2px;
+      }
+
+      .info-card h3 i {
+        font-size: 1.1rem;
+      }
+
+      .rule-list {
+        list-style: none;
+        margin-top: 0;
+      }
+
+      .rule-list li {
+        font-size: 0.82rem;
+        color: #2c3f4f;
+        margin-bottom: 0.7rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        line-height: 1.4;
+      }
+
+      .rule-list li i {
+        font-size: 0.75rem;
+        color: #c44536;
+        margin-top: 0.15rem;
+      }
+
+      .warning-text {
+        padding: 0.8rem 1rem;
+        border-radius: 0.9rem;
+        font-size: 0.82rem;
+        color: #5a4a1a;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .warning-text i {
+        font-size: 1rem;
+        color: #df1414;
+      }
+
+      /* New container inner styles */
+      .back-button {
+        background: transparent;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f6392;
+        padding: 0.5rem 0;
+        cursor: pointer;
+        margin-bottom: 1rem;
+        transition: 0.2s;
+      }
+
+      .back-button i {
+        font-size: 1.2rem;
+      }
+
+      .back-button:hover {
+        opacity: 0.7;
+      }
+
+      .action-detail-card {
+        background: #f9fbfd;
+        border-radius: 1.2rem;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        text-align: center;
+        border: 1px solid #e9edf2;
+      }
+
+      .action-detail-card i {
+        font-size: 3rem;
+        color: #1f6392;
+        margin-bottom: 0.8rem;
+      }
+
+      .action-detail-card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .feature-list {
+        text-align: left;
+        margin-top: 1rem;
+      }
+
+      .feature-list p {
+        margin: 0.7rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.85rem;
+      }
+
+      .feature-table {
+        width: 100%;
+        margin-top: 1rem;
+        border-collapse: collapse;
+      }
+
+      .feature-table td {
+        padding: 0.6rem 0;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 0.85rem;
+      }
+
+      .feature-table td:first-child {
+        font-weight: 700;
+        color: #1f6392;
+        width: 40%;
+      }
+
+      .feature-table td:last-child {
+        color: #2c3f4f;
+      }
+
+      .image-gallery {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+
+      .gallery-item {
+        width: 100%;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .gallery-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      .gallery-image:hover {
+        transform: scale(1.02);
+      }
+
+      .account-description {
+        text-align: left;
+        color: #000000;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        margin: 1rem 0;
+        padding: 1rem;
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        border-radius: 0.8rem;
+        border-left: 3px solid #1f6392;
+      }
+
+      .confirm-link {
+        display: block;
+        text-align: center;
+        background: #1f6392;
+        color: white;
+        text-decoration: none;
+        padding: 0.9rem;
+        border-radius: 2rem;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-top: 1.5rem;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .confirm-link:hover {
+        background: #0e4a6f;
+        transform: scale(0.98);
+      }
+
+      @media (max-width: 450px) {
+        .phone-container,
+        .new-phone-container {
+          max-width: 100%;
+          border-radius: 0;
+        }
+        .action-card i {
+          font-size: 1.8rem;
+        }
+        .brand-title h1 {
+          font-size: 1.6rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Main Phone Container (Original Tab) -->
+    <div class="phone-container" id="mainPhoneContainer">
+      <div class="app-header">
+        <div class="brand-row">
+          <div class="brand-title">
+            <h1>EX GLOBAL</h1>
+            <p>សូមស្វាគមន៍ មកកាន់ Ex Global</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-media">
+        <img
+          class="hero-image"
+          src="photo2.png"
+          alt="Ex Global platform preview"
+          onerror="
+            this.src =
+              'https://placehold.co/600x300/1e3a4a/FFFFFF?text=Ex+Global'
+          "
+        />
+      </div>
+
+      <div class="action-grid">
+        <div class="action-card" data-action="create">
+          <i class="fa-solid fa-circle-user"></i>
+          <p>បង្កើតគណនី</p>
+        </div>
+        <div class="action-card" data-action="deposit">
+          <i class="fa-solid fa-wallet"></i>
+          <p>ដាក់ប្រាក់</p>
+        </div>
+        <div class="action-card" data-action="withdraw">
+          <i class="fa-solid fa-hand-holding-dollar"></i>
+          <p>ដកប្រាក់</p>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <div class="info-card">
+          <h3>
+            <i
+              class="fa-solid fa-triangle-exclamation"
+              style="color: #cd5c5c"
+            ></i>
+            ⚠️ ការណែនាំសំខាន់ៗ
+          </h3>
+          <ul class="rule-list">
+            <li>
+              <i class="fa-solid fa-ban"></i>
+              <span
+                >ពួកយើងនឹងធ្វើការ Banned ភ្លាមៗទៅលើ user
+                ណាម្នាក់ដែលមិនធ្វើតាមបម្រាម</span
+              >
+            </li>
+            <li>
+              <i class="fa-solid fa-file-invoice"></i>
+              <span
+                >រាល់ការក្លែងបន្លំវិក្កយបត្រនឹងត្រូវពិន័យដោយការបិទ account</span
+              >
+            </li>
+            <li>
+              <i class="fa-solid fa-ban"></i>
+              <span>ទឹកប្រាក់ដែលត្រូវបាន banned ហើយ នឹងមិនត្រូវបានសងវិញទេ</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <h3>
+            <i class="fa-solid fa-bell" style="color: #e68a2e"></i> 🚨
+            សេចក្តីជូនដំណឹង
+          </h3>
+          <div class="warning-text">
+            <i class="fa-solid fa-shield-hog"></i>
+            <span
+              >សូមប្រយ័ត្នជនឆបោក។
+              ក្រុមហ៊ុនមិនទទួលខុសត្រូវរាល់ការផ្ទេរប្រាក់ទៅកាន់គណនីដែលមិនផ្លូវការ។</span
+            >
+          </div>
+        </div>
+      </div>
+      <div style="height: 1.5rem"></div>
+    </div>
+
+    <script>
+      (function () {
+        // Image fallback
+        const img = document.querySelector(".hero-image");
+        if (img) {
+          img.addEventListener("error", function () {
+            this.src =
+              "https://placehold.co/600x300/1e3a4a/FFFFFF?text=Ex+Global";
+          });
+        }
+
+        const mainContainer = document.getElementById("mainPhoneContainer");
+        let currentNewContainer = null;
+
+        // Disable main container (blur + no click)
+        function disableMainContainer() {
+          if (mainContainer) {
+            mainContainer.classList.add("disabled-container");
+          }
+        }
+
+        // Enable main container (remove blur)
+        function enableMainContainer() {
+          if (mainContainer) {
+            mainContainer.classList.remove("disabled-container");
+          }
+        }
+
+        // Remove new container if exists
+        function removeNewContainer() {
+          if (currentNewContainer && currentNewContainer.parentNode) {
+            // Add slide out animation before removal
+            currentNewContainer.classList.add("slide-out");
+            setTimeout(() => {
+              if (currentNewContainer && currentNewContainer.parentNode) {
+                currentNewContainer.parentNode.removeChild(currentNewContainer);
+              }
+              currentNewContainer = null;
+            }, 280);
+          } else {
+            currentNewContainer = null;
+          }
+        }
+
+        // Create and show new phone container based on action
+        function showNewPhoneContainer(actionType) {
+          // Remove any existing new container first
+          if (currentNewContainer) {
+            removeNewContainer();
+            setTimeout(() => {
+              buildAndShowContainer(actionType);
+            }, 300);
+          } else {
+            buildAndShowContainer(actionType);
+          }
+        }
+
+        function buildAndShowContainer(actionType) {
+          // Disable the main container
+          disableMainContainer();
+
+          // Define dynamic content
+          let title = "";
+          let iconClass = "";
+          let headerTitle = "";
+          let description = "";
+          let featuresHtml = "";
+          let confirmText = "";
+          let telegramUrl = "";
+          let additionalContent = "";
+
+          switch (actionType) {
+            case "create":
+              title = "បង្កើតគណនីថ្មី";
+              iconClass = "fa-solid fa-circle-user";
+              headerTitle = "Open Account";
+              description = "ចុះឈ្មោះឥឡូវនេះដើម្បីក្លាយជាសមាជិក Ex Global";
+              featuresHtml = `
+            <table class="feature-table">
+              <tr>
+                <td>Spread</td>
+                <td><strong>0.10 pips</strong></td>
+              </tr>
+              <tr>
+                <td>Leverage</td>
+                <td><strong>Unlimited</strong></td>
+              </tr>
+              <tr>
+                <td>Currency</td>
+                <td><strong>USD</strong></td>
+              </tr>
+              <tr>
+                <td>Min deposit/withdrawal</td>
+                <td><strong>$10</strong></td>
+              </tr>
+            </table>
+          `;
+
+              additionalContent = `
+            <div class="image-gallery">
+              <div class="gallery-item">
+                <img src="create.jpg" alt="Trading Platform" class="gallery-image" onerror="this.src='https://placehold.co/400x200/1e3a4a/FFFFFF?text=Trading+Platform'">
+              </div>
+            </div>
+            <div class="account-description">
+              <p>- សូមអ្នកធ្វើការផ្ញើរនូវ QR bank ដែរមានឈ្មោះអ្នក មកខ្ញុំរួចរង់ចាំ ៥នាទី – ៣ម៉ោង យើងខ្ញុំនឹងបង្កើត គណនីជូន<br></p>
+              <br>
+              <p>⚠️​​ លក្ខខណ្ឌប្រើប្រាស់ EXGLOBAL broker </p>
+              
+              <p>- ប្រាក់ចំណេញអតិបរមា អាចវិនិយោគកើនបានត្រឹម 15 ដង (x15) នៃប្រាក់ដើម ក្នុងមួយគណនី។</p>
+              <br>
+              <p>- ប្រាក់វិនិយោគរបស់អតិថិជនមិនត្រូវអោយលើស 15 ដងនៃប្រាក់ដើម,\n</p>
+              <br>
+              <p style="font-weight: bold;">📌 ចំណាំ: ប្រាក់វិនិយោគដែរលើសពី 15 ដងនៃប្រាក់ដើមមិនតម្រូវអោយទូរទាត់ជូនអតិថិជនឡើយ។ប្រាក់វិនិយោគដែរចំណេញលើសពី 15ដង ( x15 ) ចាត់ទុកជាការ « Tosix Flow »</p>
+              <br>
+              <p>- ដើម្បីជៀសវាងការខាតបង់ប្រាក់ចំណេញអតិថិជន សូមអតិថិជន ដកប្រាក់ចំណេញចេញ មុនពេលឈានដល់ 15 ដង នៃប្រាក់ដើមវិនិយោគ។</p>
+              <br>
+              <p>- ប្រាក់វិនិយោគដែរចំណេញលើសពី 15ដង ( x15 ) នឹងចាត់ទុកជាការ « Tosix Flow » </p>
+              <br>
+              <p>- ក្រុមហ៊ុនរក្សាសិទ្ធិក្នុងការកែប្រែ ឬធ្វើបច្ចុប្បន្នភាពលក្ខខណ្ឌ ដោយមិនចាំបាច់ជូនដំណឹងជាមុន។ </p>
+
+            </div>
+          `;
+              confirmText = "ចាប់ផ្តើមបង្កើតគណនី";
+              telegramUrl = "https://t.me/EXGLOBAL_TDbot";
+              break;
+
+            case "deposit":
+              title = "ដាក់ប្រាក់";
+              iconClass = "fa-solid fa-wallet";
+              headerTitle = "Deposit Funds";
+              description = "បំពេញទឹកប្រាក់ចូលគណនីភ្លាមៗ ដោយសុវត្ថិភាព";
+              featuresHtml = `
+            <div class="feature-list">
+              <p><i class="fa-solid fa-check-circle" style="color:#1f6392;"></i> ផ្ទេរតាមរយៈធនាគារទាំងអស់</p>
+              
+            </div>
+          `;
+              additionalContent = `
+            <div class="image-gallery">
+              <div class="gallery-item">
+                <img src="depo.jpg" alt="Bank Transfer" class="gallery-image" onerror="this.src='https://placehold.co/400x200/27ae60/FFFFFF?text=Bank+Transfer'">
+              </div>
+              
+            </div>
+            <div class="account-description">
+              <i class="fa-solid fa-money-bill-transfer" style="color:#1f6392; margin-right: 0.5rem;"></i> 
+              <strong>របៀបដាក់ប្រាក់</strong><br><br>
+              ✓ សូមធ្វើការចុច Menu ឬ  <i style="font-size: 1rem;" class="fa-solid fa-bars"></i> ដើម្បីចុចDeposit<br><br> 
+              ✓ ផ្ទេរប្រាក់តាមធនាគារ ABA, ACLEDA, WING, TrueMoney និងគ្រប់សាខាទាំងអស់<br><br>              
+              ✓ ប្រតិបត្តិការរហ័សទទួលបានប្រាក់ក្នុងរយៈពេល 24 ម៉ោង<br><br>
+            </div>
+          `;
+              confirmText = "បន្តដាក់ប្រាក់";
+              telegramUrl = "https://t.me/EXGLOBAL_TDbot";
+              break;
+
+            case "withdraw":
+              title = "ដកប្រាក់";
+              iconClass = "fa-solid fa-hand-holding-dollar";
+              headerTitle = "Withdraw Money";
+              description = "ស្នើសុំដកប្រាក់បានយ៉ាងងាយស្រួល 24/7";
+              featuresHtml = `
+            <div class="feature-list">
+              <p><i class="fa-solid fa-check-circle" style="color:#1f6392;"></i> ដកប្រាក់អប្បបរមា 10 ដុល្លារ</p>
+              <p><i class="fa-solid fa-check-circle" style="color:#1f6392;"></i> ប្រព័ន្ធស្វ័យប្រវត្តិដំណើរការភ្លាមៗ</p>
+              <p><i class="fa-solid fa-check-circle" style="color:#1f6392;"></i> ទទួលប្រាក់ក្នុងរយៈពេល 24 ម៉ោង</p>
+            </div>
+          `;
+              additionalContent = `
+            <div class="image-gallery">
+              <div class="gallery-item">
+                <img src="wit.jpg" alt="Fast Withdrawal" class="gallery-image" onerror="this.src='https://placehold.co/400x200/e67e22/FFFFFF?text=Fast+Withdrawal'">
+              </div>
+            </div>
+            <div class="account-description">
+               
+              <strong>របៀបដកប្រាក់</strong><br><br>
+              ✓ សូមផ្ញើរ ឈ្មោះគណនីរបស់អ្នកនិងលេខSever<br><br> 
+
+              ✓ ដកប្រាក់អប្បបរមាចាប់ពី 10 ដុល្លារឡើងទៅ<br><br>
+             
+              ✓ ប្រព័ន្ធស្វ័យប្រវត្តិដំណើរការស្នើសុំភ្លាមៗ 24/7<br><br>
+              ✓ ទទួលប្រាក់ក្នុងរយៈពេល 24 ម៉ោងបន្ទាប់ពីស្នើសុំ<br><br>
+              
+              ✓ គាំទ្រគ្រប់ធនាគារនៅកម្ពុជា៖ ABA, ACLEDA, Wing, TrueMoney, និងធនាគារដទៃទៀត<br><br>
+              <strong>ពេលវេលាដំណើរការ៖</strong> ស្វ័យប្រវត្តិ 24/7
+            </div>
+          `;
+              confirmText = "ស្នើសុំដកប្រាក់";
+              telegramUrl = "https://t.me/EXGLOBAL_TDbot";
+              break;
+
+            default:
+              title = "សេវាកម្ម Ex Global";
+              iconClass = "fa-solid fa-globe";
+              headerTitle = "Service";
+              description = "សូមជ្រើសរើសសេវាកម្មដែលអ្នកត្រូវការ";
+              featuresHtml = `
+            <div class="feature-list">
+              <p><i class="fa-solid fa-check-circle" style="color:#1f6392;"></i> សេវាកម្មអតិថិជន 24/7</p>
+              <p><i class="fa-solid fa-check-circle" style="color:#1f6392;"></i> សុវត្ថិភាពខ្ពស់</p>
+              <p><i class="fa-solid fa-check-circle" style="color:#1f6392;"></i> ប្រតិបត្តិការរហ័ស</p>
+            </div>
+          `;
+              additionalContent = "";
+              confirmText = "ទំនាក់ទំនង";
+              telegramUrl = "https://t.me/EXGLOBAL_TDbot";
+          }
+
+          // Create new container div
+          const newContainer = document.createElement("div");
+          newContainer.className = "new-phone-container";
+
+          // Build inner content with Telegram link
+          newContainer.innerHTML = `
+        <div style="padding: 1.5rem 1.2rem; flex: 1;">
+          <button class="back-button" id="closeNewContainerBtn">
+            <i class="fa-solid fa-arrow-left"></i> ត្រឡប់ក្រោយ
+          </button>
+          
+          <div class="app-header" style="padding: 0 0 0.5rem 0;">
+            <div class="brand-row">
+              <div class="brand-title">
+                <h1>EX GLOBAL</h1>
+                <p>${headerTitle}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="action-detail-card">
+            <i class="${iconClass}"></i>
+            <h3>${title}</h3>
+            <p style="color: #5c6f87; font-size: 0.85rem; margin-top: 0.2rem;">${description}</p>
+            ${featuresHtml}
+            ${additionalContent}
+            <a href="${telegramUrl}" target="_blank" class="confirm-link">
+               ${confirmText}
+            </a>
+          </div>
+          
+          <div class="info-card" style="margin-top: 1rem;">
+            <h3><i class="fa-solid fa-shield-heart"></i> ការធានាសុវត្ថិភាព</h3>
+            <p style="font-size: 0.8rem;">⚠️ សូមអានព័ត៌មានឲ្យបានច្បាស់មុនធ្វើការដាក់ប្រាក់និងដកប្រាក់</p>
+          </div>
+        </div>
+      `;
+
+          document.body.appendChild(newContainer);
+          currentNewContainer = newContainer;
+
+          // Close button event (back button)
+          const closeBtn = newContainer.querySelector("#closeNewContainerBtn");
+          if (closeBtn) {
+            closeBtn.addEventListener("click", function (e) {
+              e.preventDefault();
+              closeNewContainerAndRestore();
+            });
+          }
+        }
+
+        function closeNewContainerAndRestore() {
+          if (currentNewContainer) {
+            // Add slide-out animation
+            currentNewContainer.classList.add("slide-out");
+            setTimeout(() => {
+              if (currentNewContainer && currentNewContainer.parentNode) {
+                currentNewContainer.parentNode.removeChild(currentNewContainer);
+              }
+              currentNewContainer = null;
+              // Re-enable main container (remove blur & pointer-events)
+              enableMainContainer();
+            }, 280);
+          } else {
+            enableMainContainer();
+          }
+        }
+
+        // Attach click listeners to action cards
+        const actionCards = document.querySelectorAll(".action-card");
+        actionCards.forEach((card) => {
+          card.addEventListener("click", function (e) {
+            e.stopPropagation();
+            let action = this.getAttribute("data-action");
+            if (!action) {
+              // fallback detection from icon
+              const iconElem = this.querySelector("i");
+              if (iconElem) {
+                if (iconElem.classList.contains("fa-circle-user"))
+                  action = "create";
+                else if (iconElem.classList.contains("fa-wallet"))
+                  action = "deposit";
+                else if (iconElem.classList.contains("fa-hand-holding-dollar"))
+                  action = "withdraw";
+                else action = "create";
+              } else {
+                action = "create";
+              }
+            }
+            showNewPhoneContainer(action);
+          });
+        });
+
+        // Handle accidental escape or back button (optional)
+        window.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && currentNewContainer) {
+            closeNewContainerAndRestore();
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
